@@ -8,6 +8,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	"github.com/yellowhat/terraform-provider-hetznerrobot/internal/client"
 )
 
@@ -22,8 +23,9 @@ const (
 func ResourceOSRescue() *schema.Resource {
 	return &schema.Resource{
 		Description: `Reboot a server into Hetzner Robot rescue system:
+
 1. activate the Hetzner Robot rescue system
-2. issue a hw reset (equivalent to pressing the reset button)
+2. issue the reset (hw by default, sw for a Ctrl+Alt+Del)
 3. wait for the rescue system's SSH port to come up
 4. rename the server
 
@@ -57,6 +59,18 @@ Read and Delete are no-ops, so destroying the resource does not deactivate rescu
 					"If non-empty, the rescue system disables password authentication and `ssh_password` will be empty. " +
 					"If left empty, Hetzner generates a one-shot root password (returned in `ssh_password`).",
 				Elem: &schema.Schema{Type: schema.TypeString},
+			},
+			"reboot": {
+				Type:         schema.TypeString,
+				Optional:     true,
+				Default:      "hw",
+				ForceNew:     true,
+				ValidateFunc: validation.StringInSlice([]string{"hw", "sw"}, false),
+				Description: `Reset type used to boot into the rescue system after activation:
+* hw performs a hardware reset (equivalent to pressing the reset button on the chassis)
+* sw sends Ctrl+Alt+Del to the running OS for a clean reboot (Linux/Unix only)
+
+Only takes effect on Create — changing this forces recreate.`,
 			},
 			"ip": {
 				Type:        schema.TypeString,
@@ -103,11 +117,9 @@ func resourceOSRescueCreate(
 	ip := rescueResp.Rescue.ServerIP
 	pass := rescueResp.Rescue.Password
 
-	err = hClient.RebootServer(ctx, serverID, "hw")
+	err = hClient.RebootServer(ctx, serverID, d.Get("reboot").(string))
 	if err != nil {
-		return diag.FromErr(
-			fmt.Errorf("failed to reboot server %s with power reset: %w", serverID, err),
-		)
+		return diag.FromErr(fmt.Errorf("failed to reset server %s: %w", serverID, err))
 	}
 
 	err = waitForSSH(ctx, ip, waitMin*time.Minute, retryAfterSec*time.Second)
