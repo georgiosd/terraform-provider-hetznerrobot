@@ -11,23 +11,34 @@ import (
 var testFirewall = client.Firewall{
 	IP:                       "1.2.3.4",
 	WhitelistHetznerServices: true,
+	FilterIPv6:               true,
 	Status:                   "active",
 	Rules: client.FirewallRules{
 		//exhaustruct:ignore
 		Input: []client.FirewallRule{
 			{
-				Name:     "allow-ssh",
-				SrcIP:    "0.0.0.0/0",
-				DstPort:  "22",
-				Protocol: "tcp",
-				Action:   "accept",
+				IPVersion: "ipv4",
+				Name:      "allow-ssh",
+				SrcIP:     "0.0.0.0/0",
+				DstPort:   "22",
+				Protocol:  "tcp",
+				Action:    "accept",
 			},
 			{
-				Name:     "allow-http",
-				SrcIP:    "0.0.0.0/0",
-				DstPort:  "80",
-				Protocol: "tcp",
-				Action:   "accept",
+				IPVersion: "ipv4",
+				Name:      "allow-http",
+				SrcIP:     "0.0.0.0/0",
+				DstPort:   "80",
+				Protocol:  "tcp",
+				Action:    "accept",
+			},
+			{
+				IPVersion: "ipv6",
+				Name:      "allow-ssh-v6",
+				SrcIP:     "::/0",
+				DstPort:   "22",
+				Protocol:  "tcp",
+				Action:    "accept",
 			},
 		},
 	},
@@ -62,6 +73,14 @@ func TestGetFirewall(t *testing.T) {
 		)
 	}
 
+	if testFirewall.FilterIPv6 != firewall.FilterIPv6 {
+		t.Errorf(
+			"FilterIPv6: want %t, got %t",
+			testFirewall.FilterIPv6,
+			firewall.FilterIPv6,
+		)
+	}
+
 	if testFirewall.Status != firewall.Status {
 		t.Errorf("Status: want %v, got %v", testFirewall.Status, firewall.Status)
 	}
@@ -76,6 +95,10 @@ func TestGetFirewall(t *testing.T) {
 
 	for i, wantRule := range testFirewall.Rules.Input {
 		gotRule := firewall.Rules.Input[i]
+		if wantRule.IPVersion != gotRule.IPVersion {
+			t.Errorf("Rule[%d] IPVersion: want %v, got %v", i, wantRule.IPVersion, gotRule.IPVersion)
+		}
+
 		if wantRule.Name != gotRule.Name {
 			t.Errorf("Rule[%d] Name: want %v, got %v", i, wantRule.Name, gotRule.Name)
 		}

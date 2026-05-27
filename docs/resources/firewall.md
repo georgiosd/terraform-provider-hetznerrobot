@@ -17,7 +17,13 @@ resource "hetznerrobot_firewall" "firewall" {
   server_id     = 1234567
   active        = true
   whitelist_hos = true
+  # Set true to also evaluate IPv6 packets against the rule list. When false
+  # (Hetzner default), IPv6 traffic bypasses all rules.
+  filter_ipv6 = true
 
+  # Each rule defaults to ip_version = "ipv4" if not specified, matching the
+  # behavior of pre-1.5.0 versions of this provider. Per the Hetzner API,
+  # `ip_version` is required whenever `protocol` is set on a rule.
   rule {
     name     = "icmp"
     protocol = "icmp"
@@ -29,6 +35,15 @@ resource "hetznerrobot_firewall" "firewall" {
     protocol = "tcp"
     dst_port = "22"
     action   = "accept"
+  }
+
+  # IPv6 variant of the SSH rule.
+  rule {
+    ip_version = "ipv6"
+    name       = "ssh-v6"
+    protocol   = "tcp"
+    dst_port   = "22"
+    action     = "accept"
   }
 
   rule {
@@ -48,6 +63,10 @@ resource "hetznerrobot_firewall" "firewall" {
 - `server_id` (String) ID of the server to which the firewall will be applied.
 - `whitelist_hos` (Boolean) Whether to whitelist Hetzner services.
 
+### Optional
+
+- `filter_ipv6` (Boolean) Whether to also filter IPv6 packets. When false (Hetzner default), only IPv4 rules apply and IPv6 traffic is unrestricted. When true, IPv6 traffic is evaluated against the rule list using the per-rule ip_version field.
+
 ### Read-Only
 
 - `id` (String) The ID of this resource.
@@ -63,6 +82,7 @@ Optional:
 
 - `dst_ip` (String) Destination IP address.
 - `dst_port` (String) Destination port.
+- `ip_version` (String) IP version this rule matches against (ipv4 or ipv6). Defaults to ipv4 to preserve behavior of pre-1.5.0 versions of this provider, which hardcoded ipv4. Note: per the Hetzner Robot API, rules with a `protocol` value require `ip_version` to be set.
 - `name` (String) Name of the firewall rule.
 - `protocol` (String) Protocol (e.g., tcp, udp).
 - `src_ip` (String) Source IP address.

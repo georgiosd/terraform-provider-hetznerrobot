@@ -1451,17 +1451,26 @@ paths:
                 firewall:
                   ip: "1.2.3.4"
                   whitelist_hos: true
+                  filter_ipv6: true
                   status: "active"
                   rules:
                     input:
-                      - name: allow-ssh
+                      - ip_version: ipv4
+                        name: allow-ssh
                         src_ip: 0.0.0.0/0
                         dst_port: "22"
                         protocol: tcp
                         action: accept
-                      - name: allow-http
+                      - ip_version: ipv4
+                        name: allow-http
                         src_ip: 0.0.0.0/0
                         dst_port: "80"
+                        protocol: tcp
+                        action: accept
+                      - ip_version: ipv6
+                        name: allow-ssh-v6
+                        src_ip: "::/0"
+                        dst_port: "22"
                         protocol: tcp
                         action: accept
         '404':
@@ -1527,17 +1536,26 @@ paths:
                 firewall:
                   ip: "1.2.3.4"
                   whitelist_hos: true
+                  filter_ipv6: true
                   status: "active"
                   rules:
                     input:
-                      - name: allow-ssh
+                      - ip_version: ipv4
+                        name: allow-ssh
                         src_ip: 0.0.0.0/0
                         dst_port: "22"
                         protocol: tcp
                         action: accept
-                      - name: allow-http
+                      - ip_version: ipv4
+                        name: allow-http
                         src_ip: 0.0.0.0/0
                         dst_port: "80"
+                        protocol: tcp
+                        action: accept
+                      - ip_version: ipv6
+                        name: allow-ssh-v6
+                        src_ip: "::/0"
+                        dst_port: "22"
                         protocol: tcp
                         action: accept
         '400':
