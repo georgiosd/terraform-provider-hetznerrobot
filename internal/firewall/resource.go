@@ -323,9 +323,15 @@ func buildFirewallRules(ruleList []any) []client.FirewallRule {
 
 func flattenFirewallRules(rules []client.FirewallRule) []map[string]any {
 	result := make([]map[string]any, 0, len(rules))
+
 	for _, rule := range rules {
+		ipVersion := rule.IPVersion
+		if ipVersion == "" {
+			ipVersion = "ipv4"
+		}
+
 		result = append(result, map[string]any{
-			"ip_version": rule.IPVersion,
+			"ip_version": ipVersion,
 			"name":       rule.Name,
 			"src_ip":     rule.SrcIP,
 			"src_port":   rule.SrcPort,

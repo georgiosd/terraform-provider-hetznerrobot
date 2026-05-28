@@ -87,8 +87,7 @@ func (c *HetznerRobotClient) SetFirewall(
 	data.Set("status", firewall.Status)
 
 	for index, rule := range firewall.Rules.Input {
-		// Default to ipv4 when the caller doesn't specify, preserving the
-		// behavior of pre-ip_version-aware versions of this provider.
+		// Default to ipv4 when the caller doesn't specify.
 		ipVersion := rule.IPVersion
 		if ipVersion == "" {
 			ipVersion = "ipv4"
