@@ -302,8 +302,6 @@ func buildFirewallRules(ruleList []any) []client.FirewallRule {
 
 	for _, ruleMap := range ruleList {
 		ruleProps := ruleMap.(map[string]any)
-		// ip_version absent from older configs is handled by the schema Default
-		// ("ipv4") and the client-side fallback in SetFirewall.
 		ipVersion, _ := ruleProps["ip_version"].(string)
 		rules = append(rules, client.FirewallRule{
 			IPVersion: ipVersion,

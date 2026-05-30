@@ -33,14 +33,6 @@ var testFirewall = client.Firewall{
 	},
 }
 
-// testFirewallIPv6 mirrors testFirewall with filter_ipv6 enabled and adds an
-// IPv6 SSH rule alongside the IPv4 ones, to exercise SetFirewall's handling of
-// the per-rule ip_version field and the top-level filter_ipv6 field on the
-// wire. GET round-trip is covered by TestGetFirewall against the default v4
-// fixture; the mock server returns a single fixed example so we can't easily
-// vary the GET response per test, but POST request validation against the
-// OpenAPI schema catches malformed payloads regardless.
-//
 //nolint:gochecknoglobals
 var testFirewallIPv6 = client.Firewall{
 	IP:                       "1.2.3.4",
@@ -171,9 +163,6 @@ func TestSetFirewall(t *testing.T) {
 	}
 }
 
-// TestSetFirewallIPv6 exercises SetFirewall with the IPv6 fixture. The mock
-// server validates the POST body against the OpenAPI schema, so a malformed
-// filter_ipv6 / ip_version payload would fail validation and surface here.
 func TestSetFirewallIPv6(t *testing.T) {
 	t.Parallel()
 
