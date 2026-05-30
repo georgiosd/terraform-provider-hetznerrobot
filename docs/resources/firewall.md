@@ -37,10 +37,9 @@ resource "hetznerrobot_firewall" "firewall" {
   }
 }
 
-# Example with IPv6 also filtered: set filter_ipv6 = true and add explicit
-# rules with ip_version = "ipv6" alongside the ipv4 rules. Per the Hetzner
-# API, `ip_version` is required whenever `protocol` is set on a rule, and
-# IPv4 and IPv6 are evaluated against separate per-rule ip_version values.
+# Example with IPv6 also filtered:
+# * set filter_ipv6 = true
+# * add explicit rules with ip_version = "ipv6" alongside the ipv4 rules
 resource "hetznerrobot_firewall" "firewall_ipv6" {
   server_id     = 7654321
   active        = true
