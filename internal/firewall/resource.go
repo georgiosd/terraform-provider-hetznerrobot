@@ -219,18 +219,20 @@ func resourceDelete(ctx context.Context, d *schema.ResourceData, meta any) diag.
 	err = hClient.SetFirewall(ctx, client.Firewall{
 		IP:                       server.IP,
 		WhitelistHetznerServices: false,
+		FilterIPv6:               false,
 		Status:                   "active",
 		Rules: client.FirewallRules{
 			Input: []client.FirewallRule{
 				{
-					Name:     "Allow all",
-					SrcIP:    "",
-					SrcPort:  "",
-					DstIP:    "",
-					DstPort:  "",
-					Protocol: "",
-					TCPFlags: "",
-					Action:   "accept",
+					IPVersion: "ipv4",
+					Name:      "Allow all",
+					SrcIP:     "",
+					SrcPort:   "",
+					DstIP:     "",
+					DstPort:   "",
+					Protocol:  "",
+					TCPFlags:  "",
+					Action:    "accept",
 				},
 			},
 		},

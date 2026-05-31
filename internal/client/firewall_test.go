@@ -11,6 +11,7 @@ import (
 var testFirewall = client.Firewall{
 	IP:                       "1.2.3.4",
 	WhitelistHetznerServices: true,
+	FilterIPv6:               false,
 	Status:                   "active",
 	Rules: client.FirewallRules{
 		//exhaustruct:ignore

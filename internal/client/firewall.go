@@ -92,6 +92,7 @@ func (c *HetznerRobotClient) SetFirewall(
 		if ipVersion == "" {
 			ipVersion = "ipv4"
 		}
+
 		data.Set(fmt.Sprintf("rules[input][%d][ip_version]", index), ipVersion)
 
 		fields := map[string]string{
